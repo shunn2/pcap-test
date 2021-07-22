@@ -25,7 +25,7 @@ bool parse(Param* param, int argc, char* argv[]) {
 	return true;
 }
 
-void print_info(Ethernet* eth, Ip* ip, Tcp* tcp)
+void print_info(Ethernet* eth, Ip* ip, Tcp* tcp, uint8_t* data)
 {
     printf("=========Ethernet=========\n");
     printf("src mac: %02X:%02X:%02X:%02X:%02X:%02X\n",eth->s_mac[0],eth->s_mac[1],eth->s_mac[2],eth->s_mac[3],eth->s_mac[4],eth->s_mac[5]);
@@ -36,6 +36,10 @@ void print_info(Ethernet* eth, Ip* ip, Tcp* tcp)
     printf("============TCP===========\n");
     printf("src port: %u %u\n",tcp->s_port[0],tcp->s_port[1]);
     printf("dst port: %u %u\n",tcp->d_port[0],tcp->d_port[1]);
+    printf("===========PAYLOAD========\n");
+    for(int i=0; i<8; i++){
+        printf("%02X ",data[i]);
+    }
 }
 
 int main(int argc, char* argv[]) {
@@ -73,11 +77,11 @@ int main(int argc, char* argv[]) {
         Tcp* tcp_h = (Tcp*)(packet + ethernet_size + ip_size);
         int tcp_size = ((tcp_h->HLR & 0xF0) >> 4) * 4;
 
-        u_char* data = (u_char*)(packet + ethernet_size + ip_size + tcp_size);
+        uint8_t* data = (uint8_t*)(packet + ethernet_size + ip_size + tcp_size);
         //int data_size = ntohs(ip_h->total_len) - (ip_size + tcp_size);
 
         //printf("%u bytes captured\n", header->caplen);
-        print_info(ethernet_h, ip_h, tcp_h);
+        print_info(ethernet_h, ip_h, tcp_h, data);
         printf("\n \n");
 	}
 
